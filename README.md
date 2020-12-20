@@ -25,3 +25,7 @@ Test Cases:
 2. Test Case to check the complete execution of all the given input string (this can be customized from the unit test function).
 3. Test Case to check the data type of the given string
 4. Test Case to check the error code of the given string
+
+Exception Handling and Logging:
+
+Exception handling and logging is maintained throughout the code and if any excpetion is encoutered it is logged. Different types of logs were used.
