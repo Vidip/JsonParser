@@ -14,9 +14,11 @@ To Run the Application:
 
 Folder Structure:
 
-1. runner.py -> Main file to execute all the read, process and write operation
-2. read_and_process.py -> Having Class with all the read,process and write logic in it.
-3. test/testscript.py -> Having all the unit test cases
+1. `runner.py` -> Main file to execute all the read, process and write operation
+2. `read_and_process.py` -> Having Class with all the read,process and write logic in it.
+3. `test/testscript.py` -> Having all the unit test cases
+4. All the input files are in `input_files` folder
+5. All output generated files are in `output_files` folder
 
 
 Test Cases:
