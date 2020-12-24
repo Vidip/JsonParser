@@ -124,7 +124,7 @@ class InputParser:
             for i in range(0,number_of_records):
                 for k in range(0,len(self.error_codes)):
                     #checking from the datafrane if that error code exists, then looking for the relevant message template
-                    if df['Error Code'][i] == self.error_codes[k]['code']:
+                    if df['Error Code'][i] == self.error_codes[k]['code'] and df['Sub-Section'][i] != '':
                         message = self.error_codes[k]['message_template']
                         message = message.replace("LXY",df['Sub-Section'][i]).replace("LX", df['Section'][i])
                         if df['Error Code'][i] == 'E02':
@@ -150,6 +150,7 @@ class InputParser:
             original_len = len(word)
             self.val = False
             #loop to all the chacaters of the word
+            print(word)
             for index,j in enumerate(word):
                 len_of_char = len(j)
                 if index == 0:
@@ -201,7 +202,8 @@ class InputParser:
                                     checker = False
                                     self.another_data_type("word_characters",index,original_len,len_of_char,obj[index-1]['max_length'],j)
                             elif obj[index-1]['data_type'] == 'word_characters':
-                                if j.isalpha():
+                                temp_j = j.replace(" ","")
+                                if temp_j.isalpha():
                                     self.dataframe["Given DataType"].append("word_characters")
                                     self.len_check(len_of_char,obj[index-1]['max_length'],"E01","E03")
                                 else:
