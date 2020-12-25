@@ -68,6 +68,7 @@ class InputParser:
             #used pandas to store the dataframe which is further used to write data to csv or 
             #can be use for further transformation
             df = pd.DataFrame(self.dataframe)
+            df = df[df['Sub-Section'] != '']
             df.to_csv('output_files/lines_char.csv',index=False)
             return True
         except Exception as e:

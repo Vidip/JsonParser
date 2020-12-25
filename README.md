@@ -2,13 +2,20 @@
 
 To Run the Application:
 
-1. First have to activate the virtual environment using following command:
+1. To installvirtualenv: `pip install virtualenv`
+
+2. Creating a new virtual environment: `python -m venv env`
+
+3. First have to activate the virtual environment using following command:
    `source env/bin/activate`
 
-2. To run the Main Class - Runner class using following command:
+4. Install all depedencies:
+	`pip install -r requirements.txt`
+
+3. To run the Main Class - Runner class using following command:
 	`python runner.py`
 
-3. To run the Test Cases, following command can be used:
+4. To run the Test Cases, following command can be used:
 	`python test/testscript.py TestData`
 
 
