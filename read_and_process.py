@@ -75,14 +75,6 @@ class InputParser:
         except Exception as e:
             logging.exception(e)
             return False
-
-    #function to check length of the input and return the error code accordignly
-    def len_check(self,len_of_char,max_length,error_code_one,error_code_two):
-        if len_of_char <= max_length and len_of_char > 0:
-            self.dataframe["Error Code"].append(error_code_one)
-        else:
-            self.dataframe["Error Code"].append(error_code_two)
-        return 1
     
     #function to write data to text file
     def write_to_txt_file(self):
