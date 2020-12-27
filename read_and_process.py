@@ -68,52 +68,13 @@ class InputParser:
             #used pandas to store the dataframe which is further used to write data to csv or 
             #can be use for further transformation
             df = pd.DataFrame(self.dataframe)
+            print(df)
             df = df[df['Sub-Section'] != '']
             df.to_csv('output_files/lines_char.csv',index=False)
             return True
         except Exception as e:
             logging.exception(e)
             return False
-
-    #function to check length of the input and return the error code accordignly
-    def len_check(self,len_of_char,max_length,error_code_one,error_code_two):
-        if len_of_char <= max_length and len_of_char > 0:
-            self.dataframe["Error Code"].append(error_code_one)
-        else:
-            self.dataframe["Error Code"].append(error_code_two)
-        return 1
-
-    #function to check data type
-    def check_data_type(self,j,check_type):
-        try:
-            if check_type == 'digits':
-                if j.isdigit():
-                    self.dataframe["Given DataType"].append("digits")
-                else:
-                    self.dataframe["Given DataType"].append("others")
-            elif check_type == 'word_characters':
-                if j.isalpha():
-                    self.dataframe["Given DataType"].append("word_characters")
-                else:
-                    self.dataframe["Given DataType"].append("others")
-            return 1
-        except Exception as e:
-            logging.exception(e)
-            return 0
-
-    #function to check data types which are not valid and checking and inserting data for data type others
-    def another_data_type(self,data_type,index,original_len,len_of_char,max_length,j):
-        try:
-            if index < original_len:
-                self.len_check(len_of_char,max_length,"E02","E04")
-                self.check_data_type(j,data_type)
-            else:
-                self.dataframe["Error Code"].append("E05")
-                self.dataframe["Given DataType"].append("")
-            return 1
-        except Exception as e:
-            logging.exception(e)
-            return 0
     
     #function to write data to text file
     def write_to_txt_file(self):
@@ -137,7 +98,22 @@ class InputParser:
             return True
         except Exception as e:
             logging.info(e)  
-            return False         
+            return False
+
+    def pass_error_codes(self,j,required_length):
+        if len(j) <= required_length:
+            self.dataframe["Error Code"].append("E01")
+        else:
+            self.dataframe["Error Code"].append("E03")
+        return True
+
+    def insert_dataframe_values(self,sub_section,data_type,given_length,max_length,section):
+        self.dataframe["Sub-Section"].append(sub_section)
+        self.dataframe["Expected DataType"].append(data_type)
+        self.dataframe["Expected MaxLength"].append(max_length)
+        self.dataframe["Given Length"].append(given_length)
+        self.dataframe["Section"].append(section)
+        return True
 
     #main logic function for checking different scenarios 
     def process_data(self,lines):
@@ -151,7 +127,6 @@ class InputParser:
             original_len = len(word)
             self.val = False
             #loop to all the chacaters of the word
-            print(word)
             for index,j in enumerate(word):
                 len_of_char = len(j)
                 if index == 0:
@@ -163,60 +138,41 @@ class InputParser:
                             if key in self.data[k]['key']:
                                 obj = self.data[k]['sub_sections']
                                 break
-                        #condition where length of word is smaller than the given standard description schema
-                        if index == len(word)-1 and len(word)-1 < len(obj):
-                            if not self.val:
-                                difference = len(obj) - index
-                                while(difference!=0): word.append(""); difference -= 1                                
-                                self.val = True
-                        #condition to append the given length of the input character
-                        # else consition for all the empty/missing characters
-                        if index < original_len:
-                            self.dataframe["Given Length"].append(len_of_char)
-                        else: self.dataframe["Given Length"].append("")
 
-                        #condition to check if length of input word is greater than the given standard description
-                        if index > len(obj) and len(word)-1 > len(obj):
-                            #following empty values are appended as no expected values are mentioned in the standard_definition
-                            self.dataframe["Sub-Section"].append("")
-                            self.dataframe["Expected DataType"].append("")
-                            self.dataframe["Expected MaxLength"].append("")
-                            self.dataframe["Error Code"].append("E05")  
-                            if j.isalpha():
-                                self.dataframe["Given DataType"].append("word_characters") 
+                        if index <= len(obj):
+                            required_data_type = obj[index-1]['data_type']
+                            required_length = obj[index-1]['max_length']
+                            temp_j = j.replace(" ","")
+                            if temp_j.isalpha():
+                                self.dataframe["Given DataType"].append("word_characters")
                             elif j.isdigit():
-                                self.dataframe["Given DataType"].append("digits") 
-                            else:
-                                self.dataframe["Given DataType"].append("others") 
-                        else:
-                            self.dataframe["Expected DataType"].append(obj[index-1]['data_type'])
-                            self.dataframe["Expected MaxLength"].append(obj[index-1]['max_length'])
-                            self.dataframe["Sub-Section"].append(obj[index-1]['key'])
-                            #conditions to check data type of the given character with the standard description schema
-                            if obj[index-1]['data_type'] == 'digits':
-                                if j.isdigit():
-                                    self.dataframe["Given DataType"].append("digits")
-                                    self.len_check(len_of_char,obj[index-1]['max_length'],"E01","E03")
-                                #check if character does not justfiy the data type validation but it may or may not
-                                # justify the max length validation
-                                else:
-                                    checker = False
-                                    self.another_data_type("word_characters",index,original_len,len_of_char,obj[index-1]['max_length'],j)
-                            elif obj[index-1]['data_type'] == 'word_characters':
-                                temp_j = j.replace(" ","")
-                                if temp_j.isalpha():
-                                    self.dataframe["Given DataType"].append("word_characters")
-                                    self.len_check(len_of_char,obj[index-1]['max_length'],"E01","E03")
-                                else:
-                                    checker = False
-                                    self.another_data_type("digits",index,original_len,len_of_char,obj[index-1]['max_length'],j)
-                            #condition where character is neither a digit or word character
+                                self.dataframe["Given DataType"].append("digits")
                             else:
                                 self.dataframe["Given DataType"].append("others")
-                                checker = False
-                                self.len_check(len_of_char,obj[index-1]['max_length'],"E02","E04")
-                        #appending section to the dataframe
-                        self.dataframe["Section"].append(key)
+
+                            if temp_j.isalpha() and required_data_type == 'word_characters':
+                                self.pass_error_codes(j,required_length)
+                            elif j.isdigit() and required_data_type == 'digits':
+                                self.pass_error_codes(j,required_length)
+                            elif len(j) == required_length:
+                                given_data_type = 'others'
+                                self.dataframe["Error Code"].append("E02")
+                            elif j is not None:
+                                self.dataframe["Error Code"].append("E04")
+
+                            #function to insert dataframe values
+                            self.insert_dataframe_values(obj[index-1]['key'],required_data_type,len_of_char,required_length,key)
+
+                            #if character is not present in the standar description
+                            if len(word)-1 < len(obj) and index == len(word)-1:
+                                difference = len(obj) - (len(word) -1)
+                                while(difference != 0):
+                                    required_data_type = obj[index]['data_type']
+                                    required_length = obj[index]['max_length']
+                                    self.insert_dataframe_values(obj[index-1]['key'],required_data_type,"",required_length,key)
+                                    self.dataframe["Given DataType"].append("")
+                                    self.dataframe["Error Code"].append("E05")
+                                    difference -= 1
                     except Exception as e:
                         logging.exception(e)
                         return False
