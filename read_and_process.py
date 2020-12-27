@@ -113,6 +113,7 @@ class InputParser:
             self.dataframe["Error Code"].append("E01")
         else:
             self.dataframe["Error Code"].append("E03")
+        return True
 
     def insert_dataframe_values(self,sub_section,data_type,given_length,max_length,section):
         self.dataframe["Sub-Section"].append(sub_section)
@@ -120,6 +121,7 @@ class InputParser:
         self.dataframe["Expected MaxLength"].append(max_length)
         self.dataframe["Given Length"].append(given_length)
         self.dataframe["Section"].append(section)
+        return True
 
     #main logic function for checking different scenarios 
     def process_data(self,lines):
@@ -133,7 +135,6 @@ class InputParser:
             original_len = len(word)
             self.val = False
             #loop to all the chacaters of the word
-            print(word)
             for index,j in enumerate(word):
                 len_of_char = len(j)
                 if index == 0:
@@ -172,9 +173,7 @@ class InputParser:
 
                             #if character is not present in the standar description
                             if len(word)-1 < len(obj) and index == len(word)-1:
-                                print("hello") 
                                 difference = len(obj) - (len(word) -1)
-                                print(difference)
                                 while(difference != 0):
                                     required_data_type = obj[index]['data_type']
                                     required_length = obj[index]['max_length']
